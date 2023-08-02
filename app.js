@@ -1,47 +1,44 @@
 const express = require("express");
-const bodyParser = require("body-parser");
+const app = express();
 const path = require("path");
-const multer = require("multer");
 require("dotenv").config();
+
+const port = process.env.PORT;
+const server = app.listen(port, () => {
+  console.log(` chat server is runnig on ${port} port `);
+});
+const connectionCount = new Set();
+const htmlFile = path.join(__dirname, "public", "chat.html");
+app.use(express.static(path.join(__dirname, "public")));
+
+const bodyParser = require("body-parser");
 require("./data/connect");
 
-const { PORT } = process.env;
-
-const app = express();
 const isAuth = require("./middleware/isAuth");
 const authRoutes = require("./routes/auth");
-const adminRoutes = require("./routes/user");
-
-// middleware
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./image");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + file.originalname);
-  },
-});
-
-const upload = multer({
-  storage,
-  fileFilter: function (req, file, cb) {
-    const type = ["image/png", "image/jpg", "image/jpeg"];
-    if (type.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(null, false);
-    }
-  },
-});
-
-app.use(express.static(path.join(__dirname, "public")));
 
 app.use(bodyParser.urlencoded());
 app.use(express.json());
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "public"));
 
 app.use("/auth", authRoutes);
-app.use("/user", isAuth, upload.single("imageUrl"), adminRoutes);
-
-app.listen(PORT, () => {
-  console.log(`server is  running on ${PORT}`);
+app.use("/", isAuth, (req, res, next) => {
+  const { userName } = req.user;
+  res.render("chat", { userName });
+});
+const io = require("socket.io")(server);
+io.on("connection", (socket) => {
+  connectionCount.add(socket.id);
+  io.emit("countconnection", connectionCount.size);
+  socket.on("disconnect", () => {
+    connectionCount.delete(socket.id);
+    io.emit("countconnection", connectionCount.size);
+  });
+  socket.on("message", (data) => {
+    socket.broadcast.emit("brodcastmessage", data);
+  });
+  socket.on("feedback", (data) => {
+    socket.broadcast.emit("brodcastfeedback", data);
+  });
 });
