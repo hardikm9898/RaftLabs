@@ -1,12 +1,19 @@
-const Product = require("../model/product");
-const { success, error } = require("../response-api/responseApi");
-const { statusCode, message } = require("../constant/constant");
+import Product from '../model/product';
+import { success, error } from '../response-api/responseApi';
+import { statusCode, message } from '../constant/constant';
 
 // ? Input : Title , Price, Description --- Output : Add Product to the Product Database
 
 const addProduct = async (req, res) => {
   try {
+    interface body {
+      title: string;
+      price: number;
+      description: string;
+    }
+
     const { title, price, description } = req.body;
+
     const imageUrl = req.file.path;
 
     const product = new Product({
@@ -16,11 +23,12 @@ const addProduct = async (req, res) => {
       imageUrl,
       userId: req.user._id,
     });
+
     await product.save();
     res
       .status(statusCode.CREATED)
-      .json(success("success", message.ADD_PRODUCT, res.statusCode));
-  } catch (err) {
+      .json(success('success', message.ADD_PRODUCT, res.statusCode));
+  } catch (err: any) {
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .json(error(message.SERVER_ERROR, res.statusCode));
@@ -41,12 +49,12 @@ const getProductList = async (req, res) => {
     }
     limit = +size;
     const products = await Product.find()
-      .sort("price")
+      .sort('price')
       .skip((page - 1) * size)
       .limit(limit);
     return res
       .status(statusCode.SUCCESS)
-      .json(success("success", { page, size, products }, res.statusCode));
+      .json(success('success', { page, size, products }, res.statusCode));
   } catch (err) {
     return res
       .status(statusCode.INTERNAL_SERVER_ERROR)
@@ -62,7 +70,7 @@ const getSingleProduct = async (req, res) => {
     if (product) {
       return res
         .status(statusCode.SUCCESS)
-        .json(success("success", { product }, res.statusCode));
+        .json(success('success', { product }, res.statusCode));
     }
     res
       .status(statusCode.NOT_FOUND)
@@ -89,7 +97,7 @@ const updateProduct = async (req, res) => {
       );
       return res
         .status(statusCode.SUCCESS)
-        .json(success("success", message.DATA_UPDATED));
+        .json(success('success', message.DATA_UPDATED, res.statusCode));
     }
     res
       .status(statusCode.NOT_FOUND)
@@ -111,7 +119,7 @@ const deleteProduct = async (req, res) => {
       await Product.deleteOne({ _id: productId });
       return res
         .status(statusCode.SUCCESS)
-        .json(success("success", message.DATA_DELETED, res.statusCode));
+        .json(success('success', message.DATA_DELETED, res.statusCode));
     }
     res
       .status(statusCode.NOT_FOUND)
@@ -131,7 +139,7 @@ const sortProduct = async (req, res) => {
     const sortData = await Product.aggregate([{ $sort: { [name]: 1 } }]);
     return res
       .status(statusCode.SUCCESS)
-      .json(success("success", { message: sortData }, res.statusCode));
+      .json(success('success', { message: sortData }, res.statusCode));
   } catch (err) {
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
@@ -149,8 +157,8 @@ const searchProduct = async (req, res) => {
       {
         $match: {
           $or: [
-            { title: { $regex: new RegExp(searchKey, "ig") } },
-            { description: { $regex: new RegExp(searchKey, "ig") } },
+            { title: { $regex: new RegExp(searchKey, 'ig') } },
+            { description: { $regex: new RegExp(searchKey, 'ig') } },
           ],
         },
       },
@@ -159,7 +167,7 @@ const searchProduct = async (req, res) => {
     if (searchData.length) {
       return res
         .status(statusCode.SUCCESS)
-        .json(success("success", { message: searchData }, res.statusCode));
+        .json(success('success', { message: searchData }, res.statusCode));
     }
     res
       .status(statusCode.NOT_FOUND)
@@ -171,7 +179,7 @@ const searchProduct = async (req, res) => {
   }
 };
 
-module.exports = {
+const userController = {
   deleteProduct,
   updateProduct,
   getSingleProduct,
@@ -180,3 +188,5 @@ module.exports = {
   sortProduct,
   searchProduct,
 };
+
+export default userController;

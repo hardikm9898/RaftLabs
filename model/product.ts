@@ -1,5 +1,5 @@
-const { ObjectId } = require("mongodb");
-const mongoose = require("mongoose");
+import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
   title: {
@@ -16,7 +16,7 @@ const productSchema = new mongoose.Schema({
   },
   userId: {
     type: ObjectId,
-    ref: "User",
+    ref: 'User',
   },
   imageUrl: {
     data: Buffer,
@@ -25,4 +25,4 @@ const productSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Product", productSchema);
+export default mongoose.model('Product', productSchema);

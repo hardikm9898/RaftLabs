@@ -1,4 +1,4 @@
-const joi = require("joi");
+import joi from 'joi';
 
 const schema = {
   productSchema: joi.object().keys({
@@ -6,6 +6,7 @@ const schema = {
     description: joi.string().min(5).max(150).required(),
     price: joi.number().required(),
   }),
+
   loginSchema: joi.object().keys({
     email: joi.string().min(3).required().email(),
     password: joi.string().min(6).required(),
@@ -19,4 +20,5 @@ const schema = {
     password: joi.string().alphanum().min(6).required(),
   }),
 };
-module.exports = schema;
+
+export default schema;
