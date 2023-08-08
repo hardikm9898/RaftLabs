@@ -1,4 +1,4 @@
-const joi = require("joi");
+import joi from 'joi';
 
 const schema = {
   loginSchema: joi.object().keys({
@@ -11,4 +11,4 @@ const schema = {
     password: joi.string().alphanum().min(6).required(),
   }),
 };
-module.exports = schema;
+export default schema;

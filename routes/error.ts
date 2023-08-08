@@ -1,6 +1,6 @@
-const express = require("express");
-const { error } = require("../response-api/responseApi");
-const { statusCode, message } = require("../constant/constant");
+const express = require('express');
+const { error } = require('../response-api/responseApi');
+const { statusCode, message } = require('../../constant/constant');
 
 const router = express.Router();
 

@@ -1,11 +1,11 @@
-const success = (status, results, code) => ({
+export const success = (status, results, code) => ({
   status,
   error: false,
   code,
   results,
 });
 
-const error = (message, statusCode) => {
+export const error = (message, statusCode) => {
   // List of common HTTP request code
   const codes = {
     200: 200,
@@ -26,11 +26,9 @@ const error = (message, statusCode) => {
     error: true,
   };
 };
-const validation = (errors) => ({
-  message: "Validation errors",
+export const validation = (errors) => ({
+  message: 'Validation errors',
   error: true,
   code: 401,
   errors,
 });
-
-module.exports = { success, error, validation };
